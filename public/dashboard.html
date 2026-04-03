@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 200px;
+      height: 100vh;
+      background: #2c3e50;
+      color: white;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+    }
+
+    .sidebar button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      background: #34495e;
+      color: white;
+      cursor: pointer;
+    }
+
+    .sidebar button:hover {
+      background: #1abc9c;
+    }
+
+    .main {
+      flex: 1;
+      padding: 20px;
+      background: #ecf0f1;
+    }
+
+    iframe {
+      width: 100%;
+      height: 80vh;
+      border: none;
+      background: white;
+    }
+
+    .logout {
+      background: red !important;
+    }
+
+    .cards {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      flex: 1;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 10px #ccc;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>Hospital 🏥</h2>
+
+  <button onclick="loadPage('patient-form.html')">Patient</button>
+  <button onclick="loadPage('billing-form.html')">Billing</button>
+  <button onclick="loadPage('pharmacy-form.html')">Pharmacy</button>
+
+  <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<div class="main">
+
+  <!-- ✅ CARDS -->
+  <div class="cards">
+    <div class="card">Patients: <span id="pCount">0</span></div>
+    <div class="card">Revenue: ₹<span id="bCount">0</span></div>
+    <div class="card">Medicines: <span id="mCount">0</span></div>
+  </div>
+
+  <!-- ✅ PAGE LOAD -->
+  <iframe id="frame" src="patient-form.html"></iframe>
+
+</div>
+
+<script>
+if (!localStorage.getItem("token")) {
+  window.location.href = "/";
+}
+
+function loadPage(page) {
+  document.getElementById("frame").src = page;
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/";
+}
+
+// ✅ COUNTS FUNCTION (ALAG SE)
+async function loadCounts() {
+  const token = localStorage.getItem("token");
+
+  const p = await fetch("/patients", {
+    headers: { Authorization: "Bearer " + token }
+  });
+  const patients = await p.json();
+  document.getElementById("pCount").innerText = patients.length;
+
+  const b = await fetch("/billing", {
+    headers: { Authorization: "Bearer " + token }
+  });
+  const bills = await b.json();
+  let total = 0;
+  bills.forEach(x => total += x.amount);
+  document.getElementById("bCount").innerText = total;
+
+  const m = await fetch("/pharmacy", {
+    headers: { Authorization: "Bearer " + token }
+  });
+  const meds = await m.json();
+  document.getElementById("mCount").innerText = meds.length;
+}
+
+// ✅ LOAD KARO
+loadCounts();
+</script>
+
+</body>
+</html>

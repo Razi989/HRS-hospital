@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient List - Hospital App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Patient List</h1>
+
+    <nav>
+      <a href="/">Home</a> |
+      <a href="/patient-form">Patient Form</a> |
+      <a href="/billing-form">Billing Form</a> |
+      <a href="/billing-list">Billing List</a> |
+      <a href="/pharmacy-form">Pharmacy Form</a> |
+      <a href="/pharmacy-list">Pharmacy List</a> |
+      <a href="/data">Data</a>
+    </nav>
+
+    <section id="app-section">
+      <button id="logoutBtn">Logout</button>
+      <h2>All Patients</h2>
+      <button id="refreshPatientsBtn">Refresh</button>
+      <div class="scroll-block">
+        <table id="patientsTable">
+          <thead>
+            <tr><th>Name</th><th>Age</th><th>Phone</th><th>Problem</th><th>Doctor Type</th><th>Fee Type</th><th>Fees</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p id="statusMessage"></p>
+    </section>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

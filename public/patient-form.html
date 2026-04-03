@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Patient</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #eef2f7;
+      margin: 0;
+    }
+
+    .container {
+      width: 95%;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .form-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 10px #ccc;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px;
+      width: 160px;
+    }
+
+    button {
+      padding: 10px;
+      margin: 10px;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .add { background: green; }
+    .edit { background: orange; }
+    .delete { background: red; }
+    .next { background: blue; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 10px #ccc;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #007bff;
+      color: white;
+    }
+
+    #search {
+      width: 300px;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+
+    .bottom {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Patient Management 👨‍⚕️</h1>
+
+<input id="search" placeholder="Search Patient" onkeyup="searchData()">
+
+<div class="form-box">
+  <input id="name" placeholder="Name">
+  <input id="age" placeholder="Age">
+  <input id="phone" placeholder="Phone">
+  <input id="problem" placeholder="Problem">
+  <select id="doctorType">
+    <option value="">Select Doctor Type</option>
+    <option value="Physician">Physician</option>
+    <option value="Gynecologist">Gynecologist</option>
+  </select>
+  <select id="patientType">
+    <option value="">Select Patient Type</option>
+    <option value="IPD">IPD</option>
+    <option value="OPD">OPD</option>
+  </select>
+  <input id="fees" placeholder="Fees" type="number">
+  <input id="notes" placeholder="Notes">
+  <input id="date" type="date">
+
+  <br>
+  <button class="add" onclick="addPatient()">Add / Update</button>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Age</th>
+<th>Phone</th>
+<th>Problem</th>
+<th>Doctor Type</th>
+<th>patient Type</th>
+<th>Fees</th>
+<th>Notes</th>
+<th>Date</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="data"></tbody>
+</table>
+
+<div class="bottom">
+  <button class="next" onclick="nextPage()">Next → Billing</button>
+</div>
+
+</div>
+
+<script>
+if (!localStorage.getItem("token")) {
+  window.location.href = "/";
+}
+
+let editId = null;
+
+async function addPatient() {
+  const body = {
+    name: name.value,
+    age: age.value,
+    phone: phone.value,
+    problem: problem.value,
+    doctorType: doctorType.value,
+    patientType: patientType.value,
+    fees: fees.value,
+    notes: notes.value,
+    date: date.value
+  };
+
+  if (editId) {
+    await fetch("/patients/" + editId, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      },
+      body: JSON.stringify(body)
+    });
+    editId = null;
+  } else {
+    await fetch("/patients", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("token")
+      },
+      body: JSON.stringify(body)
+    });
+  }
+
+  clearForm();
+  loadData();
+}
+
+async function loadData() {
+  const res = await fetch("/patients", {
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("token")
+    }
+  });
+
+  const patients = await res.json();
+  data.innerHTML = "";
+
+  patients.forEach(p => {
+    let d = new Date(p.date).toLocaleDateString();
+
+    data.innerHTML += `
+    <tr>
+      <td>${p.name}</td>
+      <td>${p.age}</td>
+      <td>${p.phone}</td>
+      <td>${p.problem}</td>
+      <td>${p.doctorType || ""}</td>
+      <td>${p.patientType || ""}</td>
+      <td>${p.fees || ""}</td>
+      <td>${p.notes || ""}</td>
+      <td>${d}</td>
+      <td>
+        <button class="edit" onclick='editPatient(${JSON.stringify(p)})'>Edit</button>
+        <button class="delete" onclick="deletePatient('${p._id}')">Delete</button>
+      </td>
+    </tr>`;
+  });
+}
+
+function editPatient(p) {
+  name.value = p.name;
+  age.value = p.age;
+  phone.value = p.phone;
+  problem.value = p.problem;  doctorType.value = p.doctorType || "";
+  patientType.value = p.patientType || "";
+  fees.value = p.fees || "";  notes.value = p.notes;
+  date.value = p.date ? p.date.split("T")[0] : "";
+  editId = p._id;
+}
+
+async function deletePatient(id) {
+  await fetch("/patients/" + id, {
+    method: "DELETE",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("token")
+    }
+  });
+  loadData();
+}
+
+function clearForm() {
+  name.value = "";
+  age.value = "";
+  phone.value = "";
+  problem.value = "";
+  doctorType.value = "";
+  patientType.value = "";
+  fees.value = "";
+  notes.value = "";
+  date.value = "";
+}
+
+function searchData() {
+  let value = document.getElementById("search").value.toLowerCase();
+  let rows = document.querySelectorAll("tbody tr");
+
+  rows.forEach(row => {
+    row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+  });
+}
+
+function nextPage() {
+  window.location.href = "/billing-form.html";
+}
+
+loadData();
+</script>
+
+</body>
+</html>

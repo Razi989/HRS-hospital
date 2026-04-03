@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Billing - Hospital</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #eef2f7;
+      margin: 0;
+    }
+
+    .container {
+      width: 90%;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .form-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 10px #ccc;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px;
+      margin: 10px;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .add { background: green; }
+    .delete { background: red; }
+    .next { background: blue; }
+    .back { background: orange; }
+    .logout { background: black; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 10px #ccc;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Billing 💰</h1>
+
+<div class="form-box">
+  <input id="patientId" placeholder="Patient ID">
+  <input id="amount" placeholder="Amount">
+  <input id="desc" placeholder="Description">
+
+  <br>
+  <button class="add" onclick="addBilling()">Add Billing</button>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Patient Name</th>
+<th>Phone</th>
+<th>Amount</th>
+<th>Description</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="data"></tbody>
+</table>
+
+<br>
+
+<button class="back" onclick="backPage()">← Patient</button>
+<button class="next" onclick="nextPage()">Next → Pharmacy</button>
+<button class="logout" onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+if (!localStorage.getItem("token")) {
+  window.location.href = "/";
+}
+
+async function addBilling() {
+  await fetch("/billing", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + localStorage.getItem("token")
+    },
+    body: JSON.stringify({
+      patientId: patientId.value,
+      amount: amount.value,
+      description: desc.value
+    })
+  });
+
+  alert("Billing Added");
+  loadData();
+}
+
+async function loadData() {
+  const res = await fetch("/billing", {
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("token")
+    }
+  });
+
+  const bills = await res.json();
+  data.innerHTML = "";
+
+  bills.forEach(b => {
+    data.innerHTML += `
+    <tr>
+      <td>${b.patientId?.name || ""}</td>
+      <td>${b.patientId?.phone || ""}</td>
+      <td>${b.amount}</td>
+      <td>${b.description || ""}</td>
+      <td>
+        <button class="delete" onclick="deleteBill('${b._id}')">Delete</button>
+      </td>
+    </tr>`;
+  });
+}
+
+async function deleteBill(id) {
+  await fetch("/billing/" + id, {
+    method: "DELETE",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("token")
+    }
+  });
+
+  loadData();
+}
+
+function backPage() {
+  window.location.href = "/patient-form.html";
+}
+
+function nextPage() {
+  window.location.href = "/pharmacy-form.html";
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/";
+}
+
+loadData();
+</script>
+
+</body>
+</html>

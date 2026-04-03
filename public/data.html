@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Overview - Hospital App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Data Overview</h1>
+
+    <nav>
+      <a href="/">Home</a> |
+      <a href="/patient-form">Patient Form</a> |
+      <a href="/billing-form">Billing Form</a> |
+      <a href="/pharmacy-form">Pharmacy Form</a>
+    </nav>
+
+    <section id="app-section">
+      <button id="logoutBtn">Logout</button>
+
+      <div class="tab-buttons">
+        <button id="tabPatients">Patients</button>
+        <button id="tabBilling">Billing</button>
+        <button id="tabPharmacy">Pharmacy</button>
+      </div>
+
+      <div id="patientsPanel" class="data-panel">
+        <h2>All Patients</h2>
+        <button id="refreshPatientsBtn">Refresh Patients</button>
+        <div class="scroll-block">
+          <table id="patientsTable">
+            <thead>
+              <tr><th>Name</th><th>Age</th><th>Phone</th><th>Problem</th><th>Doctor Type</th><th>Fee Type</th><th>Fees</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="billingPanel" class="data-panel hidden">
+        <h2>All Billings</h2>
+        <button id="refreshBillingBtn">Refresh Billings</button>
+        <div class="scroll-block">
+          <ul id="billingList"></ul>
+        </div>
+      </div>
+
+      <div id="pharmacyPanel" class="data-panel hidden">
+        <h2>All Prescriptions</h2>
+        <button id="refreshPharmacyBtn">Refresh Prescriptions</button>
+        <div class="scroll-block">
+          <ul id="pharmacyList"></ul>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

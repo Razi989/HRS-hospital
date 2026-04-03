@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Billing List - Hospital App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Billing List</h1>
+
+    <nav>
+      <a href="/">Home</a> |
+      <a href="/patient-form">Patient Form</a> |
+      <a href="/patient-list">Patient List</a> |
+      <a href="/billing-form">Add Billing</a> |
+      <a href="/pharmacy-form">Pharmacy Form</a> |
+      <a href="/pharmacy-list">Pharmacy List</a> |
+      <a href="/data">Data</a>
+    </nav>
+
+    <section id="app-section">
+      <button id="logoutBtn">Logout</button>
+      <h2>All Billing Records</h2>
+      <button id="refreshBillingBtn">Refresh</button>
+      <div class="scroll-block">
+        <ul id="billingList"></ul>
+      </div>
+      <p id="statusMessage"></p>
+    </section>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

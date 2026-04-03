@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pharmacy</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #eef2f7;
+      margin: 0;
+    }
+
+    .container {
+      width: 90%;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .form-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 10px #ccc;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px;
+      margin: 10px;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .add { background: green; }
+    .delete { background: red; }
+    .back { background: orange; }
+    .logout { background: black; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 10px #ccc;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Pharmacy 💊</h1>
+
+<div class="form-box">
+  <input id="patientId" placeholder="Patient ID">
+  <input id="medicine" placeholder="Medicine">
+  <input id="dose" placeholder="Dose">
+  <input id="inst" placeholder="Instructions">
+
+  <br>
+  <button class="add" onclick="addPharmacy()">Add Medicine</button>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Patient Name</th>
+<th>Phone</th>
+<th>Medicine</th>
+<th>Dose</th>
+<th>Instructions</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="data"></tbody>
+</table>
+
+<br>
+
+<button class="back" onclick="backPage()">← Billing</button>
+<button class="logout" onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+if (!localStorage.getItem("token")) {
+  window.location.href = "/";
+}
+
+async function addPharmacy() {
+  await fetch("/pharmacy", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + localStorage.getItem("token")
+    },
+    body: JSON.stringify({
+      patientId: patientId.value,
+      medicine: medicine.value,
+      dose: dose.value,
+      instructions: inst.value
+    })
+  });
+
+  alert("Medicine Added");
+  loadData();
+}
+
+async function loadData() {
+  const res = await fetch("/pharmacy", {
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("token")
+    }
+  });
+
+  const items = await res.json();
+  data.innerHTML = "";
+
+  items.forEach(p => {
+    data.innerHTML += `
+    <tr>
+      <td>${p.patientId?.name || ""}</td>
+      <td>${p.patientId?.phone || ""}</td>
+      <td>${p.medicine}</td>
+      <td>${p.dose}</td>
+      <td>${p.instructions || ""}</td>
+      <td>
+        <button class="delete" onclick="deleteItem('${p._id}')">Delete</button>
+      </td>
+    </tr>`;
+  });
+}
+
+async function deleteItem(id) {
+  await fetch("/pharmacy/" + id, {
+    method: "DELETE",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("token")
+    }
+  });
+
+  loadData();
+}
+
+function backPage() {
+  window.location.href = "/billing-form.html";
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/";
+}
+
+loadData();
+</script>
+
+</body>
+</html>
