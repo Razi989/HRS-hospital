@@ -9,7 +9,6 @@ app.get("/", (req, res) => {
 // SAFE PORT
 const PORT = process.env.PORT || 3000;
 
-// START SERVER
 app.listen(PORT, "0.0.0.0", () => {
-  console.log("Server started on " + PORT);
+  console.log("Server running on port " + PORT);
 });
