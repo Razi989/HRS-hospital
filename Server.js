@@ -8,16 +8,16 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static folder
-app.use(express.static("public"));
+// ✅ Static folder (VERY IMPORTANT)
+app.use(express.static(path.join(__dirname, "public")));
 
-// MongoDB connect
+// ✅ MongoDB Connect (safe)
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+.then(() => console.log("MongoDB Connected ✅"))
+.catch(err => console.log("Mongo Error ❌", err));
 
-// Schema
-const PatientSchema = new mongoose.Schema({
+// ✅ Schema
+const patientSchema = new mongoose.Schema({
   name: String,
   age: Number,
   phone: String,
@@ -26,37 +26,37 @@ const PatientSchema = new mongoose.Schema({
   date: String
 });
 
-const Patient = mongoose.model("Patient", PatientSchema);
+const Patient = mongoose.model("Patient", patientSchema);
 
-// Routes
+// ✅ Routes
 
-// Home
+// test route
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.send("Hospital Server Running 🚀");
 });
 
-// Add patient
-app.post("/add-patient", async (req, res) => {
-  const patient = new Patient(req.body);
-  await patient.save();
-  res.redirect("/");
-});
-
-// Get patients
+// get patients
 app.get("/patients", async (req, res) => {
   const data = await Patient.find();
   res.json(data);
 });
 
-// Delete patient
-app.get("/delete/:id", async (req, res) => {
-  await Patient.findByIdAndDelete(req.params.id);
-  res.redirect("/");
+// add patient
+app.post("/add", async (req, res) => {
+  const newPatient = new Patient(req.body);
+  await newPatient.save();
+  res.send("Patient Added ✅");
 });
 
-// PORT (IMPORTANT)
+// delete patient
+app.delete("/delete/:id", async (req, res) => {
+  await Patient.findByIdAndDelete(req.params.id);
+  res.send("Deleted ✅");
+});
+
+// ✅ PORT FIX (IMPORTANT FOR RAILWAY)
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("Server started on " + PORT);
+  console.log("Server running on port " + PORT);
 });
