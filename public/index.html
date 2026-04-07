@@ -1,103 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
-
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial;
-      background: linear-gradient(135deg, #4facfe, #00f2fe);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .box {
-      background: white;
-      padding: 40px;
-      border-radius: 10px;
-      text-align: center;
-      width: 300px;
-    }
-
-    h1 {
-      margin-bottom: 20px;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: none;
-      color: white;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    .login { background: #007bff; }
-    .register { background: #28a745; }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #2c3e50; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.5); text-align: center; width: 300px; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { width: 100%; padding: 10px; margin: 5px 0; cursor: pointer; border: none; border-radius: 5px; color: white; font-weight: bold; }
+        .login { background-color: #3498db; }
+        .register { background-color: #27ae60; }
+        #msg { margin-top: 15px; font-size: 14px; }
+    </style>
 </head>
-
 <body>
 
 <div class="box">
-  <h1>Hospital Management 🏥</h1>
-
-  <input id="username" placeholder="Username">
-  <input id="password" type="password" placeholder="Password">
-
-  <button class="login" onclick="login()">Login</button>
-  <button class="register" onclick="register()">Register</button>
-
-  <p id="msg"></p>
+    <h2>Hospital Management 🏥</h2>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    
+    <button class="login" onclick="login()">Login</button>
+    <button class="register" onclick="register()">Register</button>
+    
+    <p id="msg"></p>
 </div>
 
 <script>
-async function login() {
-  const res = await fetch("/auth/login", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      username: username.value,
-      password: password.value
-    })
-  });
+    // Aapka Railway Backend Link
+    const API_URL = "https://hrs-hospital-production-fde2.up.railway.app";
 
-  const data = await res.json();
+    async function login() {
+        const u = document.getElementById("username").value;
+        const p = document.getElementById("password").value;
+        const msg = document.getElementById("msg");
 
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-    window.location.href = "/patient-form"; // 🔥 IMPORTANT
-  } else {
-    msg.innerText = data.error;
-  }
-}
+        try {
+            const res = await fetch(`${API_URL}/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: u, password: p })
+            });
 
-async function register() {
-  await fetch("/auth/register", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      username: username.value,
-      password: password.value
-    })
-  });
+            const data = await res.json();
+            msg.innerText = data.message;
 
-  alert("Registered! Now login");
-}
+            if (res.status === 200) {
+                msg.style.color = "green";
+                // Login hone par dashboard par bhejne ke liye
+                setTimeout(() => { window.location.href = "patient-list.html"; }, 1500);
+            } else {
+                msg.style.color = "red";
+            }
+        } catch (err) {
+            msg.innerText = "Server se connect nahi ho paya!";
+            msg.style.color = "red";
+        }
+    }
+
+    async function register() {
+        const u = document.getElementById("username").value;
+        const p = document.getElementById("password").value;
+        const msg = document.getElementById("msg");
+
+        try {
+            const res = await fetch(`${API_URL}/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: u, password: p })
+            });
+
+            const data = await res.json();
+            msg.innerText = data.message;
+            msg.style.color = (res.status === 201) ? "green" : "red";
+        } catch (err) {
+            msg.innerText = "Registration failed!";
+            msg.style.color = "red";
+        }
+    }
 </script>
 
 </body>

@@ -6,6 +6,33 @@
   <title>Patient List - Hospital App</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+<script>
+    async function loadPatients() {
+        const res = await fetch("https://hrs-hospital-production-fde2.up.railway.app/patients");
+        const patients = await res.json();
+        
+        const tbody = document.querySelector("#patientsTable tbody");
+        tbody.innerHTML = ""; // Purana data saaf karne ke liye
+
+        patients.forEach(p => {
+            const row = `<tr>
+                <td>${p.name}</td>
+                <td>${p.age}</td>
+                <td>${p.phone}</td>
+                <td>${p.problem}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // Page khulte hi data load ho jaye
+    window.onload = loadPatients;
+
+    // Logout function
+    document.getElementById("logoutBtn").onclick = () => {
+        window.location.href = "index.html";
+    };
+</script>
 <body>
   <div class="container">
     <h1>Patient List</h1>
